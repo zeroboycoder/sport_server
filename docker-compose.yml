@@ -1,0 +1,13 @@
+version: '3'
+services:
+  user-service-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args: 
+        - PORT=$PORT
+    restart: always
+    ports:
+      - 3000:$PORT
+    env_file:
+      - .env
