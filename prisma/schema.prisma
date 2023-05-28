@@ -12,15 +12,15 @@ datasource db {
 
 model user {
   id           Int       @id @default(autoincrement())
-  phone        String    @unique @db.VarChar(255)
+  phone        String
   password     String    @db.VarChar(255)
-  // role_id      Role     @relation(fields: [roleId], references: [id])
-  role_id      Int       @db.Int()
   user_code    String    @db.VarChar(255)
   status       Boolean   @default(true)
   ban_end_date DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+  role_id      Int
+  role         role      @relation(fields: [role_id], references: [id])
 }
 
 model agent {
@@ -31,10 +31,24 @@ model agent {
   secret_code String @db.VarChar(255)
 }
 
+model customer {
+  id       Int    @id @default(autoincrement())
+  name     String
+  user_id  Int
+  agent_id Int
+}
+
+model wallet {
+  id      Int    @id @default(autoincrement())
+  user_id Int
+  type    String
+  amount  Int
+}
+
 model role {
-  id          Int    @id @default(autoincrement())
-  name        String @db.VarChar(255)
-  description String @db.VarChar(255)
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(255)
+  user user[]
 }
 
 model deposit {

@@ -2,16 +2,49 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const bcrypt = require("bcrypt");
 
-exports.registerUser = async (req, res) => {
+exports.createUser = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
-
-        bcrypt.hash(password, 10, async (err, hash) => {
-            const result = await prisma.user.create({
-                data: { name, email, password: hash },
-            });
-            return res.send(result);
+        const { phone, password, name, agent_id, walletType, amount } = req.body;
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user_code =
+            name.split(" ").join("").toLowerCase() +
+            Math.ceil(Math.random() * 10) +
+            Math.ceil(Math.random() * 10);
+        // Create User
+        // Create Customer
+        // Create Wallet
+        // Create Token
+        const newUser = await prisma.user.create({
+            data: {
+                phone,
+                password: hashedPassword,
+                role_id: 1,
+                user_code,
+            },
         });
+
+        const newCustomer = await prisma.customer.create({
+            data : {
+                name : name,
+                user_id : newUser.id,
+                agent_id : agent_id
+            }
+        })
+
+        const newWallet = await prisma.wallet.create({
+            user_id : newUser.id,
+            type : walletType,
+            amount
+        })
+        const token = jwt.sign({ agentId: newAgent.id, userId : newCustomer.id }, process.env.TOKEN);
+        return res.send({
+            status: "success",
+            data: {
+                token,
+            },
+            message: "User created",
+        });
+
     } catch (error) {
         console.log("Error :> ", error);
     } finally {
@@ -41,8 +74,8 @@ exports.signinUser = async (req, res) => {
         async () => {
             await prisma.$disconnect();
         };
-    }
-};
+    };
+}
 
 exports.fetchUsers = async (req, res) => {
     try {
