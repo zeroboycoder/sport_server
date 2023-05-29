@@ -7,6 +7,13 @@ require("dotenv").config();
 exports.createAgent = async (req, res) => {
   try {
     const { phone, password, name, address, walletType, amount } = req.body;
+    if (phone.match(/^[0]?[00-9]{10}$/) === null) {
+      return res.send({
+        status: "error",
+        data: {},
+        message: "Invalid phone number",
+      });
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
     const user_code =
       name.split(" ").join("").toLowerCase() +
