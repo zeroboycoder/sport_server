@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id           Int       @id @default(autoincrement())
+  phone        String
+  password     String    @db.VarChar(255)
+  user_code    String    @db.VarChar(255)
+  status       Boolean   @default(true)
+  ban_end_date DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  role_id      Int
+  role         role      @relation(fields: [role_id], references: [id])
+}
+
+model agent {
+  id          Int    @id @default(autoincrement())
+  user_id     Int
+  name        String @db.VarChar(255)
+  address     String @db.VarChar(255)
+  secret_code String @db.VarChar(255)
+}
+
+model customer {
+  id       Int    @id @default(autoincrement())
+  name     String
+  user_id  Int
+  agent_id Int
+}
+
+model wallet {
+  id      Int    @id @default(autoincrement())
+  user_id Int
+  type    String
+  amount  Int
+}
+
+model role {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(255)
+  user user[]
+}
+
+model deposit {
+  id                      Int     @id @default(autoincrement())
+  agent_id                Int
+  amount                  Int
+  sender_account_name     String
+  sender_account_number   Int
+  receiver_account_name   String
+  receiver_account_number Int
+  payment_provider_name   String
+  transaction_number      Int
+  status                  Boolean @default(false)
+  remark                  String
+  reject_remark           String
+  imgUrl                  String
+}
