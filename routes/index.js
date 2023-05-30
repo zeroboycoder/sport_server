@@ -2,6 +2,7 @@ const route = require("express").Router();
 const userController = require("../controllers/user");
 const agentController = require("../controllers/agentController");
 const depositController = require("../controllers/depositController");
+const { body } = require("express-validator");
 
 // route.get("/", (req, res) => res.send("Hello World"));
 
@@ -16,13 +17,41 @@ const depositController = require("../controllers/depositController");
 // route.delete("/delete-user/:userId", userController.deleteUser);
 
 // Agents
-route.post("/create-agent", agentController.createAgent);
+route.post(
+  "/create-agent",
+  [
+    body(
+      "phone",
+      "Phone number length between 9 and 11 and; start with 0"
+    ).isLength({ min: 9, max: 11 }),
+    body("password", "Password must not be empty").trim().notEmpty(),
+  ],
+  agentController.createAgent
+);
 
-route.post("/signin", agentController.signin);
+route.post(
+  "/signin",
+  [
+    body(
+      "phone",
+      "Phone number length between 9 and 11 and; start with 0"
+    ).isLength({ min: 9, max: 11 }),
+    body("password", "Password must not be empty").trim().notEmpty(),
+  ],
+  agentController.signin
+);
 
-route.put("/update-agent", agentController.updateAgent);
+route.put(
+  "/update-agent",
+  body("userId", "User id must not be empty").notEmpty(),
+  agentController.updateAgent
+);
 
-route.delete("/delete-agent", agentController.deleteAgent);
+route.delete(
+  "/delete-agent",
+  body("userId", "User id must not be empty").notEmpty(),
+  agentController.deleteAgent
+);
 
 // Deposit
 // route.post("/deposit", depositController.deposit)

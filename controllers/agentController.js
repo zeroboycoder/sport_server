@@ -1,12 +1,23 @@
+require("dotenv").config();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-require("dotenv").config();
+const { validationResult } = require("express-validator");
 
 exports.createAgent = async (req, res) => {
   try {
     const { phone, password, name, address, walletType, amount } = req.body;
+    const validationError = validationResult(req);
+    if (!validationError.isEmpty()) {
+      return res.send({
+        status: "error",
+        data: {
+          error: validationError,
+        },
+        message: "Validation Error",
+      });
+    }
     if (phone.match(/^[0]?[00-9]{10}$/) === null) {
       return res.send({
         status: "error",
@@ -71,6 +82,16 @@ exports.createAgent = async (req, res) => {
 exports.signin = async (req, res) => {
   try {
     const { phone, password } = req.body;
+    const validationError = validationResult(req);
+    if (!validationError.isEmpty()) {
+      return res.send({
+        status: "error",
+        data: {
+          error: validationError,
+        },
+        message: "Validation Error",
+      });
+    }
     const user = await prisma.user.findFirst({
       where: {
         phone,
@@ -117,6 +138,16 @@ exports.signin = async (req, res) => {
 exports.updateAgent = async (req, res) => {
   try {
     const { userId, phone, name, address } = req.body;
+    const validationError = validationResult(req);
+    if (!validationError.isEmpty()) {
+      return res.send({
+        status: "error",
+        data: {
+          error: validationError,
+        },
+        message: "Validation Error",
+      });
+    }
     if (phone) {
       await prisma.user.update({
         where: {
@@ -154,6 +185,16 @@ exports.updateAgent = async (req, res) => {
 exports.deleteAgent = async (req, res) => {
   try {
     const { userId } = req.body;
+    const validationError = validationResult(req);
+    if (!validationError.isEmpty()) {
+      return res.send({
+        status: "error",
+        data: {
+          error: validationError,
+        },
+        message: "Validation Error",
+      });
+    }
     await prisma.user.delete({
       where: {
         id: parseInt(userId),
