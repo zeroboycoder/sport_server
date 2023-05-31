@@ -3,7 +3,7 @@ const userController = require("../controllers/user");
 const agentController = require("../controllers/agentController");
 const depositController = require("../controllers/depositController");
 
-// route.get("/", (req, res) => res.send("Hello World"));
+route.get("/", (req, res) => res.send("Hello World"));
 
 // route.post("/register", userController.registerUser);
 

@@ -1,6 +1,7 @@
 version: '3'
 services:
   user-service-app:
+    container_name: user-service-app
     build:
       context: .
       dockerfile: Dockerfile
@@ -9,5 +10,7 @@ services:
     restart: always
     ports:
       - 3000:$PORT
-    env_file:
-      - .env
+    environment:
+      - DATABASE_URL=mysql://dai_sport_user:AVNS_gc9BfJBa2ZFxuoSDX0f@db-akh-do-user-8664501-0.b.db.ondigitalocean.com:25060/dai_sport_user_db?ssl-mode=REQUIRED
+    # env_file:
+    #   - .env

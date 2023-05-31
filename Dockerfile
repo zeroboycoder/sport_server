@@ -8,7 +8,9 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install production dependencies
-RUN npm install --only=production
+RUN npm install
+COPY --chown=node:node prisma ./prisma/
+RUN npx prisma generate
 
 ARG PORT
 ENV PORT=${PORT}
