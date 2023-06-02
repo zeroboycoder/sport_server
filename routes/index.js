@@ -1,24 +1,12 @@
 const route = require("express").Router();
-const userController = require("../controllers/user");
-const agentController = require("../controllers/agentController");
+const authController = require("../controllers/authController");
+const paymentController = require("../controllers/paymentController");
 const depositController = require("../controllers/depositController");
 const { body } = require("express-validator");
 
-// route.get("/", (req, res) => res.send("Hello World"));
-
-// route.post("/register", userController.registerUser);
-
-// route.post("/signin", userController.signinUser);
-
-// route.get("/users", userController.fetchUsers);
-
-// route.put("/update-user/:userId", userController.updateUser);
-
-// route.delete("/delete-user/:userId", userController.deleteUser);
-
-// Agents
+// Authentication
 route.post(
-  "/create-agent",
+  "/create-user",
   [
     body(
       "phone",
@@ -26,11 +14,11 @@ route.post(
     ).isLength({ min: 9, max: 11 }),
     body("password", "Password must not be empty").trim().notEmpty(),
   ],
-  agentController.createAgent
+  authController.create
 );
 
 route.post(
-  "/signin",
+  "/signin-user",
   [
     body(
       "phone",
@@ -38,22 +26,21 @@ route.post(
     ).isLength({ min: 9, max: 11 }),
     body("password", "Password must not be empty").trim().notEmpty(),
   ],
-  agentController.signin
+  authController.signin
 );
 
-route.put(
-  "/update-agent",
-  body("userId", "User id must not be empty").notEmpty(),
-  agentController.updateAgent
-);
+// Payment
+route.post("/create-payment-provider", paymentController.createPaymentProvider);
 
-route.delete(
-  "/delete-agent",
-  body("userId", "User id must not be empty").notEmpty(),
-  agentController.deleteAgent
-);
+route.get("/payment-accounts", paymentController.fetchPaymentAccounts);
+
+route.post("/create-payment-account", paymentController.createPaymentAccount);
 
 // Deposit
-// route.post("/deposit", depositController.deposit)
+route.post("/deposit", depositController.deposit);
+
+route.get("/deposits", depositController.fetchDeposits);
+
+route.put("/update-deposit", depositController.updateDeposit);
 
 module.exports = route;
