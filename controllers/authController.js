@@ -5,21 +5,9 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
 
-exports.create = async (req, res) => {
-  console.log("hello");
+exports.createAgent = async (req, res) => {
   try {
-    const {
-      type,
-      phone,
-      password,
-      name,
-      email,
-      address,
-      agent_code,
-      player_id,
-      walletType,
-      amount,
-    } = req.body;
+    const { phone, password, name, email, address } = req.body;
     // Chck the validation
     const validationError = validationResult(req);
     if (!validationError.isEmpty()) {
@@ -33,104 +21,43 @@ exports.create = async (req, res) => {
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     let newUser;
-
-    if (type === "admin") {
-      const adminUserCode =
-        name.split(" ").join("").toLowerCase() +
-        Math.ceil(Math.random() * 10) +
-        Math.ceil(Math.random() * 10);
-      newUser = await prisma.user.create({
-        data: {
-          phone,
-          password: hashedPassword,
-          user_code: adminUserCode,
-          role: {
-            create: {
-              name: "admin",
-            },
-          },
-          admin: {
-            create: {
-              type: "admin",
-              name,
-              email: email ? email : "",
-              phone,
-            },
-          },
-          wallet: {
-            create: {
-              type: walletType,
-              amount: parseInt(amount),
-            },
+    const agentUserCode =
+      name.split(" ").join("").toLowerCase() +
+      Math.ceil(Math.random() * 10) +
+      Math.ceil(Math.random() * 10);
+    const secret_code = Math.random().toString(36).slice(2, 10);
+    newUser = await prisma.user.create({
+      data: {
+        phone,
+        password: hashedPassword,
+        user_code: agentUserCode,
+        role: {
+          create: {
+            name: "agent",
           },
         },
-      });
-    } else if (type === "agent") {
-      const agentUserCode =
-        name.split(" ").join("").toLowerCase() +
-        Math.ceil(Math.random() * 10) +
-        Math.ceil(Math.random() * 10);
-      const secret_code = Math.random().toString(36).slice(2, 10);
-      newUser = await prisma.user.create({
-        data: {
-          phone,
-          password: hashedPassword,
-          user_code: agentUserCode,
-          role: {
-            create: {
-              name: "agent",
-            },
-          },
-          agent: {
-            create: {
-              name,
-              address,
-              secret_code,
-            },
-          },
-          wallet: {
-            create: {
-              type: walletType,
-              amount: parseInt(amount),
-            },
+        agent: {
+          create: {
+            name,
+            address,
+            secret_code,
           },
         },
-      });
-    } else if (type === "member") {
-      const memberUserCode = agent_code + "_" + player_id;
-      newUser = await prisma.user.create({
-        data: {
-          phone,
-          password: hashedPassword,
-          user_code: memberUserCode,
-          role: {
-            create: {
-              name: "member",
-            },
-          },
-          member: {
-            create: {
-              name,
-              agent_code,
-            },
-          },
-          wallet: {
-            create: {
-              type: walletType,
-              amount: parseInt(amount),
-            },
+        wallet: {
+          create: {
+            type: walletType,
+            amount: parseInt(amount),
           },
         },
-      });
-    }
-
+      },
+    });
     const token = jwt.sign({ userId: newUser.id }, process.env.TOKEN);
     return res.send({
       status: "success",
       data: {
         token,
       },
-      message: "User created",
+      message: "Agent created",
     });
   } catch (error) {
     console.log(error);
@@ -146,7 +73,7 @@ exports.create = async (req, res) => {
   }
 };
 
-exports.signin = async (req, res) => {
+exports.signinAgent = async (req, res) => {
   try {
     const { type, phone, password } = req.body;
     const validationError = validationResult(req);
@@ -195,6 +122,50 @@ exports.signin = async (req, res) => {
     });
   } catch (error) {
     console.log("Error :>", error);
+  } finally {
+    async () => await prisma.$disconnect();
+  }
+};
+
+exports.initUser = async (req, res) => {
+  try {
+    const { player_id, player_name, unit_amount, agent_code } = req.body;
+    // Chck the validation
+    const validationError = validationResult(req);
+    if (!validationError.isEmpty()) {
+      return res.send({
+        status: "error",
+        data: {
+          error: validationError,
+        },
+        message: "Validation Error",
+      });
+    }
+    // find the user is exit or not
+    const usercode = agent_code + "_" + player_id;
+    const user = await prisma.user.findFirst({
+      where: {
+        user_code: usercode,
+      },
+    });
+    console.log(user);
+    // const token = jwt.sign({ userId: newUser.id }, process.env.TOKEN);
+    // return res.send({
+    //   status: "success",
+    //   data: {
+    //     token,
+    //   },
+    //   message: "Agent created",
+    // });
+  } catch (error) {
+    console.log(error);
+    return res.send({
+      status: "error",
+      data: {
+        error,
+      },
+      message: "Error",
+    });
   } finally {
     async () => await prisma.$disconnect();
   }
