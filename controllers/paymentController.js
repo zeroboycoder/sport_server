@@ -34,6 +34,31 @@ exports.createPaymentProvider = async (req, res) => {
   }
 };
 
+exports.deletePaymentProvider = async (req, res) => {
+  try {
+    const { provider_id } = req.body;
+    const deletedRecord = await prisma.paymentAccount.delete({
+      where: { id: provider_id },
+    });
+    return res.send({
+      status: "success",
+      data: {},
+      message: "Successfully deleted.",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.send({
+      status: "error",
+      data: {
+        error,
+      },
+      message: "Error",
+    });
+  } finally {
+    async () => await prisma.$disconnect();
+  }
+};
+
 exports.createPaymentAccount = async (req, res) => {
   try {
     const { name, accountNumber, status, qrCode, paymentProviderId } = req.body;
@@ -85,6 +110,31 @@ exports.fetchPaymentAccounts = async (req, res) => {
         ...result,
       },
       message: "Successful",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.send({
+      status: "error",
+      data: {
+        error,
+      },
+      message: "Error",
+    });
+  } finally {
+    async () => await prisma.$disconnect();
+  }
+};
+
+exports.deletePaymentAccounts = async (req, res) => {
+  try {
+    const { account_id } = req.body;
+    const deletedRecord = await prisma.paymentAccount.delete({
+      where: { id: account_id },
+    });
+    return res.send({
+      status: "success",
+      data: {},
+      message: "Successfully deleted.",
     });
   } catch (error) {
     console.log(error);
