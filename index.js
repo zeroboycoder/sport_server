@@ -28,7 +28,7 @@ const options = {
 
 const spacs = swaggerJsdocs(options);
 
-app.use("/api/user", routes);
+app.use("/api/users", routes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(spacs));
 
 app.listen(PORT, () => console.log(`Server is running at ${PORT}`));
