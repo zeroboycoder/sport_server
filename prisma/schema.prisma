@@ -11,38 +11,58 @@ datasource db {
 }
 
 model user {
-  id           Int       @id @default(autoincrement())
-  phone        String
-  password     String    @db.VarChar(255)
-  user_code    String    @db.VarChar(255)
-  status       Boolean   @default(true)
-  ban_end_date DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  role_id      Int
-  role         role      @relation(fields: [role_id], references: [id])
+  id                     Int              @id @default(autoincrement())
+  phone                  String
+  password               String           @db.VarChar(255)
+  user_code              String           @db.VarChar(255)
+  status                 Boolean          @default(true)
+  ban_end_date           DateTime?
+  admin                  admin[]
+  agent                  agent[]
+  member                 member[]
+  wallet                 wallet[]
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @updatedAt
+  role                   role?            @relation(fields: [roleId], references: [id])
+  roleId                 Int?
+  deposit                deposit[]
+  transferRecordSender   transferRecord[] @relation("TransferRecordSender")
+  transferRecordReceiver transferRecord[] @relation("TransferRecordReceiver")
 }
 
 model agent {
   id          Int    @id @default(autoincrement())
-  user_id     Int
   name        String @db.VarChar(255)
   address     String @db.VarChar(255)
   secret_code String @db.VarChar(255)
+  user        user?  @relation(fields: [userId], references: [id])
+  userId      Int?
 }
 
-model customer {
-  id       Int    @id @default(autoincrement())
-  name     String
-  user_id  Int
-  agent_id Int
+model member {
+  id         Int    @id @default(autoincrement())
+  name       String
+  agent_code String
+  user       user?  @relation(fields: [userId], references: [id])
+  userId     Int?
+}
+
+model admin {
+  id      Int    @id @default(autoincrement())
+  type    String
+  name    String
+  email   String
+  phone   String
+  user    user?  @relation(fields: [user_id], references: [id])
+  user_id Int?
 }
 
 model wallet {
-  id      Int    @id @default(autoincrement())
-  user_id Int
-  type    String
-  amount  Int
+  id     Int    @id @default(autoincrement())
+  type   String
+  amount Int
+  user   user?  @relation(fields: [userId], references: [id])
+  userId Int?
 }
 
 model role {
@@ -51,18 +71,59 @@ model role {
   user user[]
 }
 
+model paymentProvider {
+  id             Int              @id @default(autoincrement())
+  name           String
+  logo           String?
+  type           String
+  status         Boolean          @default(true)
+  paymentAccount paymentAccount[]
+}
+
+model paymentAccount {
+  id                Int             @id @default(autoincrement())
+  name              String
+  account_number    String
+  status            Boolean         @default(true)
+  qr_code           String
+  payment_provider  paymentProvider @relation(fields: [paymentProviderId], references: [id])
+  paymentProviderId Int
+  deposit           deposit[]
+}
+
 model deposit {
-  id                      Int     @id @default(autoincrement())
-  agent_id                Int
-  amount                  Int
-  sender_account_name     String
-  sender_account_number   Int
-  receiver_account_name   String
-  receiver_account_number Int
-  payment_provider_name   String
-  transaction_number      Int
-  status                  Boolean @default(false)
-  remark                  String
-  reject_remark           String
-  imgUrl                  String
+  id                    Int            @id @default(autoincrement())
+  amount                Int
+  sender_id             Int
+  sender_account_name   String
+  sender_account_number String
+  transaction_number    Int
+  paymentAccountId      Int
+  confirm               Boolean        @default(false)
+  remark                String
+  reject_remark         String
+  imgUrl                String
+  paymentAccount        paymentAccount @relation(fields: [paymentAccountId], references: [id])
+  sender                user           @relation(fields: [sender_id], references: [id])
+}
+
+model transferRecord {
+  id                    Int              @id @default(autoincrement())
+  amount                Int
+  sender                user?            @relation("TransferRecordSender", fields: [sender_id], references: [id])
+  sender_id             Int?
+  receiver              user?            @relation("TransferRecordReceiver", fields: [receiver_d], references: [id])
+  receiver_d            Int?
+  transactionType       transactionType? @relation(fields: [transaction_type_id], references: [id])
+  transaction_type_id   Int?
+  sender_before_amount  Int
+  sender_after_amount   Int
+  receiver_after_amount Int
+}
+
+model transactionType {
+  id             Int              @id @default(autoincrement())
+  name           String
+  description    String
+  transferRecord transferRecord[]
 }
