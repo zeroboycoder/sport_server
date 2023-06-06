@@ -29,7 +29,7 @@ exports.deposit = async (req, res) => {
         },
         transaction_number: parseInt(transaction_number),
         imgUrl: imgUrl || "",
-        confirm: false,
+        confirm: "false",
         remark: "",
         reject_remark: "",
       },
@@ -82,19 +82,36 @@ exports.fetchDeposits = async (req, res) => {
 
 exports.updateDeposit = async (req, res) => {
   try {
-    const { deposit_id, confirm } = req.body;
-    const result = await prisma.deposit.update({
+    const { user_id, deposit_id, confirm } = req.body;
+    const deposit = await prisma.deposit.update({
       where: {
-        id: deposit_id,
+        id: parseInt(deposit_id),
       },
       data: {
-        confirm: confirm === "true" ? true : false,
+        confirm,
       },
     });
+    let wallet;
+    if (confirm === "true") {
+      const originalWallet = await prisma.wallet.findFirst({
+        where: {
+          userId: parseInt(user_id),
+        },
+      });
+      wallet = await prisma.wallet.update({
+        where: {
+          userId: parseInt(user_id),
+        },
+        data: {
+          amount: parseInt(originalWallet.amount) + parseInt(deposit.amount),
+        },
+      });
+    }
     return res.send({
       status: "success",
       data: {
-        ...result,
+        deposit,
+        wallet,
       },
       message: "Deposit Confirmed",
     });
