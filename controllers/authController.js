@@ -44,8 +44,8 @@ exports.createAgent = async (req, res) => {
         },
         wallet: {
           create: {
-            type: walletType,
-            amount: parseInt(amount),
+            type: "main",
+            amount: 0,
           },
         },
       },
@@ -74,7 +74,7 @@ exports.createAgent = async (req, res) => {
 
 exports.signinAgent = async (req, res) => {
   try {
-    const { type, phone, password } = req.body;
+    const { phone, password } = req.body;
     const validationError = validationResult(req);
     if (!validationError.isEmpty()) {
       return res.send({
@@ -91,13 +91,11 @@ exports.signinAgent = async (req, res) => {
       },
       include: {
         role: true,
-        admin: true,
         agent: true,
-        member: true,
         wallet: true,
       },
     });
-    if (!user || user?.role.name !== type) {
+    if (!user) {
       return res.send({
         status: "error",
         message: "User not found",
@@ -115,6 +113,7 @@ exports.signinAgent = async (req, res) => {
         status: "success",
         data: {
           token,
+          ...user,
         },
         message: "Login Successful",
       });
@@ -129,7 +128,8 @@ exports.signinAgent = async (req, res) => {
 exports.updateAgent = async (req, res) => {
   console.log("Hello");
   try {
-    const { userId, name, phone, address } = req.body;
+    const { userId } = req.params;
+    const { name, phone, address } = req.body;
     const user = await prisma.user.update({
       where: {
         id: parseInt(userId),
@@ -158,7 +158,7 @@ exports.updateAgent = async (req, res) => {
       data: {
         token,
       },
-      message: "Agent created",
+      message: "Agent updated.",
     });
   } catch (error) {
     console.log(error);
@@ -174,7 +174,83 @@ exports.updateAgent = async (req, res) => {
   }
 };
 
-exports.deleteAgent = async (req, res) => {};
+exports.deleteAgent = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    await prisma.wallet.delete({
+      where: {
+        userId: parseInt(userId),
+      },
+    });
+    await prisma.user.delete({
+      where: {
+        id: parseInt(userId),
+      },
+    });
+
+    return res.send({
+      status: "success",
+      data: {},
+      message: "Agent deleted successfully.",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.send({
+      status: "error",
+      data: {
+        error,
+      },
+      message: "Error",
+    });
+  } finally {
+    async () => await prisma.$disconnect();
+  }
+};
+
+exports.agentProfile = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    // Chck the validation
+    const validationError = validationResult(req);
+    if (!validationError.isEmpty()) {
+      return res.send({
+        status: "error",
+        data: {
+          error: validationError,
+        },
+        message: "Validation Error",
+      });
+    }
+    const user = await prisma.user.findFirst({
+      where: {
+        id: parseInt(userId),
+      },
+      include: {
+        agent: true,
+        wallet: true,
+      },
+    });
+
+    return res.send({
+      status: "success",
+      data: {
+        ...user,
+      },
+      message: "Agent created",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.send({
+      status: "error",
+      data: {
+        error,
+      },
+      message: "Error",
+    });
+  } finally {
+    async () => await prisma.$disconnect();
+  }
+};
 
 // For member
 exports.initUser = async (req, res) => {
@@ -209,8 +285,9 @@ exports.initUser = async (req, res) => {
         status: "success",
         data: {
           token,
+          ...user,
         },
-        message: "Agent created",
+        message: "Found member",
       });
     }
     // if user not found, create user
@@ -241,8 +318,9 @@ exports.initUser = async (req, res) => {
       status: "success",
       data: {
         token,
+        ...newUser,
       },
-      message: "Agent created",
+      message: "New member created",
     });
   } catch (error) {
     console.log(error);

@@ -29,7 +29,11 @@ route.post(
   authController.signinAgent
 );
 
-route.put("/update-agent", authController.updateAgent);
+route.put("/update-agent/:userId", authController.updateAgent);
+
+route.delete("/delete-agent/:userId", authController.deleteAgent);
+
+route.get("/agent-profile/:userId", authController.agentProfile);
 
 route.post("/init", authController.initUser);
 
