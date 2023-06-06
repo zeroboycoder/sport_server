@@ -20,13 +20,12 @@ exports.createAgent = async (req, res) => {
       });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    let newUser;
     const agentUserCode =
       name.split(" ").join("").toLowerCase() +
       Math.ceil(Math.random() * 10) +
       Math.ceil(Math.random() * 10);
     const secret_code = Math.random().toString(36).slice(2, 10);
-    newUser = await prisma.user.create({
+    const newUser = await prisma.user.create({
       data: {
         phone,
         password: hashedPassword,
@@ -127,6 +126,57 @@ exports.signinAgent = async (req, res) => {
   }
 };
 
+exports.updateAgent = async (req, res) => {
+  console.log("Hello");
+  try {
+    const { userId, name, phone, address } = req.body;
+    const user = await prisma.user.update({
+      where: {
+        id: parseInt(userId),
+      },
+      data: {
+        phone,
+        agent: {
+          update: {
+            where: {
+              userId: parseInt(userId),
+            },
+            data: {
+              name,
+              address,
+            },
+          },
+        },
+      },
+      include: {
+        agent: true,
+      },
+    });
+    const token = jwt.sign({ userId: user.id }, process.env.TOKEN);
+    return res.send({
+      status: "success",
+      data: {
+        token,
+      },
+      message: "Agent created",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.send({
+      status: "error",
+      data: {
+        error,
+      },
+      message: "Error",
+    });
+  } finally {
+    async () => await prisma.$disconnect();
+  }
+};
+
+exports.deleteAgent = async (req, res) => {};
+
+// For member
 exports.initUser = async (req, res) => {
   try {
     const { player_id, player_name, unit_amount, agent_code } = req.body;
@@ -147,16 +197,53 @@ exports.initUser = async (req, res) => {
       where: {
         user_code: usercode,
       },
+      include: {
+        member: true,
+        wallet: true,
+      },
     });
-    console.log(user);
-    // const token = jwt.sign({ userId: newUser.id }, process.env.TOKEN);
-    // return res.send({
-    //   status: "success",
-    //   data: {
-    //     token,
-    //   },
-    //   message: "Agent created",
-    // });
+    // if user found, retrieve user
+    if (user) {
+      const token = jwt.sign({ userId: user.id }, process.env.TOKEN);
+      return res.send({
+        status: "success",
+        data: {
+          token,
+        },
+        message: "Agent created",
+      });
+    }
+    // if user not found, create user
+    const newUser = await prisma.user.create({
+      data: {
+        user_code: usercode,
+        role: {
+          create: {
+            name: "member",
+          },
+        },
+        member: {
+          create: {
+            name: player_name,
+            agent_code,
+          },
+        },
+        wallet: {
+          create: {
+            type: "main",
+            amount: parseInt(unit_amount),
+          },
+        },
+      },
+    });
+    const token = jwt.sign({ userId: newUser.id }, process.env.TOKEN);
+    return res.send({
+      status: "success",
+      data: {
+        token,
+      },
+      message: "Agent created",
+    });
   } catch (error) {
     console.log(error);
     return res.send({

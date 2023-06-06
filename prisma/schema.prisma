@@ -12,9 +12,9 @@ datasource db {
 
 model user {
   id                     Int              @id @default(autoincrement())
-  phone                  String
-  password               String           @db.VarChar(255)
-  user_code              String           @db.VarChar(255)
+  phone                  String?
+  password               String?          @default("")
+  user_code              String?
   status                 Boolean          @default(true)
   ban_end_date           DateTime?
   admin                  admin[]
@@ -36,7 +36,7 @@ model agent {
   address     String @db.VarChar(255)
   secret_code String @db.VarChar(255)
   user        user?  @relation(fields: [userId], references: [id])
-  userId      Int?
+  userId      Int?   @unique
 }
 
 model member {

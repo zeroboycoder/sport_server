@@ -29,6 +29,8 @@ route.post(
   authController.signinAgent
 );
 
+route.put("/update-agent", authController.updateAgent);
+
 route.post("/init", authController.initUser);
 
 // Payment
