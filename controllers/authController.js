@@ -236,7 +236,7 @@ exports.agentProfile = async (req, res) => {
       data: {
         ...user,
       },
-      message: "Agent created",
+      message: "Successful",
     });
   } catch (error) {
     console.log(error);
