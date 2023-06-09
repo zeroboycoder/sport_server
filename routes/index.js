@@ -38,7 +38,12 @@ route.delete("/delete-agent/:userId", authController.deleteAgent);
 
 route.get("/agent-profile/:userId", authController.agentProfile);
 
-route.post("/init", authController.initUser);
+route.post("/init",[
+  body("player_id").notEmpty().withMessage("player_id is required").isInt().withMessage("player_id must be an integer"),
+  body("player_name").notEmpty().withMessage("player_name is required").trim(),
+  body("unit_amount").notEmpty().withMessage("unit_amount is required").isInt().withMessage("unit_amount must be an integer"),
+  body("agent_code").notEmpty().withMessage("agent_code is required").trim(),
+], authController.initUser);
 
 // Payment
 route.post("/create-payment-provider", paymentController.createPaymentProvider);
@@ -63,5 +68,6 @@ route.post("/deposit", depositController.deposit);
 route.get("/deposits", depositController.fetchDeposits);
 
 route.put("/update-deposit", depositController.updateDeposit);
+
 
 module.exports = route;
