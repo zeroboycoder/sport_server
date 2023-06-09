@@ -4,6 +4,9 @@ const paymentController = require("../controllers/paymentController");
 const depositController = require("../controllers/depositController");
 const { body } = require("express-validator");
 
+// Test api
+route.get("/", (req, res) => res.send("Hello World"));
+
 // Authentication
 route.post(
   "/create-agent",
@@ -40,11 +43,19 @@ route.post("/init", authController.initUser);
 // Payment
 route.post("/create-payment-provider", paymentController.createPaymentProvider);
 
+route.delete(
+  "/delete-payment-providers/:provider_id",
+  paymentController.deletePaymentProvider
+);
+
 route.get("/payment-accounts", paymentController.fetchPaymentAccounts);
 
 route.post("/create-payment-account", paymentController.createPaymentAccount);
 
-route.get("/", (req, res) => res.send("Hello World"));
+route.delete(
+  "/delete-payment-accounts/:account_id",
+  paymentController.deletePaymentAccounts
+);
 
 // Deposit
 route.post("/deposit", depositController.deposit);
