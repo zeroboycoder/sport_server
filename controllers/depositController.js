@@ -83,6 +83,7 @@ exports.fetchDeposits = async (req, res) => {
 exports.updateDeposit = async (req, res) => {
   try {
     const { user_id, deposit_id, confirm } = req.body;
+    // confirm the deposit
     const deposit = await prisma.deposit.update({
       where: {
         id: parseInt(deposit_id),
@@ -91,6 +92,7 @@ exports.updateDeposit = async (req, res) => {
         confirm,
       },
     });
+    // Increase the the amount
     let wallet;
     if (confirm === "true") {
       const originalWallet = await prisma.wallet.findFirst({

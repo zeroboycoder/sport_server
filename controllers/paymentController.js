@@ -36,7 +36,7 @@ exports.createPaymentProvider = async (req, res) => {
 
 exports.deletePaymentProvider = async (req, res) => {
   try {
-    const { provider_id } = req.body;
+    const { provider_id } = req.params;
     const deletedRecord = await prisma.paymentAccount.delete({
       where: { id: provider_id },
     });
@@ -127,7 +127,7 @@ exports.fetchPaymentAccounts = async (req, res) => {
 
 exports.deletePaymentAccounts = async (req, res) => {
   try {
-    const { account_id } = req.body;
+    const { account_id } = req.params;
     const deletedRecord = await prisma.paymentAccount.delete({
       where: { id: account_id },
     });
