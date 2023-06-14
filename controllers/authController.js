@@ -7,6 +7,7 @@ const { validationResult,matchedData } = require("express-validator");
 const response = require("../utils/response");
 const integrationService = require("../services/integrationService");
 
+// Agent
 exports.createAgent = async (req, res) => {
   try {
     const { phone, password, name, email, address } = req.body;
