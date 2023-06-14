@@ -92,19 +92,21 @@ model paymentAccount {
 }
 
 model deposit {
-  id                    Int            @id @default(autoincrement())
-  amount                Int
-  sender_id             Int
-  sender_account_name   String
-  sender_account_number String
-  transaction_number    Int
-  paymentAccountId      Int
-  confirm               String         @default("false")
-  remark                String
-  reject_remark         String
-  imgUrl                String
-  paymentAccount        paymentAccount @relation(fields: [paymentAccountId], references: [id])
-  sender                user           @relation(fields: [sender_id], references: [id])
+  id                      Int            @id @default(autoincrement())
+  amount                  Int
+  sender_id               Int
+  sender_account_name     String
+  sender_account_number   String
+  transaction_number      Int
+  paymentAccountId        Int
+  receiver_account_name   String
+  receiver_account_number String
+  confirm                 String         @default("false")
+  remark                  String
+  reject_remark           String
+  imgUrl                  String
+  paymentAccount          paymentAccount @relation(fields: [paymentAccountId], references: [id])
+  sender                  user           @relation(fields: [sender_id], references: [id])
 }
 
 model transferRecord {

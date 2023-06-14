@@ -1,5 +1,6 @@
 const route = require("express").Router();
 const authController = require("../controllers/authController");
+const agentController = require("../controllers/agentController");
 const paymentController = require("../controllers/paymentController");
 const depositController = require("../controllers/depositController");
 const { body } = require("express-validator");
@@ -39,6 +40,9 @@ route.delete("/delete-agent/:userId", authController.deleteAgent);
 route.get("/agent-profile/:userId", authController.agentProfile);
 
 route.post("/init", authController.initUser);
+
+// Agent
+route.get("/agent-init", agentController.initAgent);
 
 // Payment
 route.post("/create-payment-provider", paymentController.createPaymentProvider);
