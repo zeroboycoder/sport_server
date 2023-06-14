@@ -73,5 +73,9 @@ route.get("/deposits", depositController.fetchDeposits);
 
 route.put("/update-deposit", depositController.updateDeposit);
 
+route.get('/test', async (req, res) => {
+  res.send('Hello User Service')
+})
+
 
 module.exports = route;
