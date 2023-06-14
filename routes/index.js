@@ -1,5 +1,6 @@
 const route = require("express").Router();
 const authController = require("../controllers/authController");
+const agentController = require("../controllers/agentController");
 const paymentController = require("../controllers/paymentController");
 const depositController = require("../controllers/depositController");
 const { body } = require("express-validator");
@@ -44,6 +45,9 @@ route.post("/init",[
   body("unit_amount").notEmpty().withMessage("unit_amount is required").isInt().withMessage("unit_amount must be an integer"),
   body("agent_code").notEmpty().withMessage("agent_code is required").trim(),
 ], authController.initUser);
+
+// Agent
+route.get("/agent-init", agentController.initAgent);
 
 // Payment
 route.post("/create-payment-provider", paymentController.createPaymentProvider);

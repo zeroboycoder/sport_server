@@ -8,8 +8,10 @@ exports.deposit = async (req, res) => {
       amount,
       sender_account_name,
       sender_account_number,
-      payment_account_id,
       transaction_number,
+      payment_account_id,
+      rreceiver_account_name,
+      receiver_account_number,
       imgUrl,
     } = req.body;
     const result = await prisma.deposit.create({
@@ -28,6 +30,8 @@ exports.deposit = async (req, res) => {
           },
         },
         transaction_number: parseInt(transaction_number),
+        rreceiver_account_name,
+        receiver_account_number,
         imgUrl: imgUrl || "",
         confirm: "false",
         remark: "",
