@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
 
+// Agent
 exports.createAgent = async (req, res) => {
   try {
     const { phone, password, name, email, address } = req.body;

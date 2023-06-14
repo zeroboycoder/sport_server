@@ -42,7 +42,11 @@ route.get("/agent-profile/:userId", authController.agentProfile);
 route.post("/init", authController.initUser);
 
 // Agent
-route.get("/agent-init", agentController.initAgent);
+route.get("/init-agent", agentController.initAgent);
+
+route.get("/get-users", agentController.getUsers);
+
+route.get("/get-user", agentController.getUserByAgentCode);
 
 // Payment
 route.post("/create-payment-provider", paymentController.createPaymentProvider);
