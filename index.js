@@ -27,7 +27,9 @@ const options = {
 };
 
 const spacs = swaggerJsdocs(options);
-
+// app.use("/", (req, res) => {
+//   res.send("Welcome to Dia-Sport USER SERVICE API");
+// });
 app.use("/api/users", routes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(spacs));
 
