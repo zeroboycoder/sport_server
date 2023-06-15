@@ -65,10 +65,8 @@ exports.createAgent = async (req, res) => {
     console.log(error);
     return res.send({
       status: "error",
-      data: {
-        error,
-      },
-      message: "Error",
+      message: error.message,
+      data:null
     });
   } finally {
     async () => await prisma.$disconnect();
