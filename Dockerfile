@@ -1,35 +1,46 @@
 # Use an official Node.js runtime as the base image
 FROM node:19-alpine AS base
 
-# Set the working directory inside the container
-WORKDIR /app
+#INATALL NGINX AND SUPERVISOR
 
-# Copy package.json and package-lock.json to the container
+RUN apk update
+
+RUN apk add nginx
+
+RUN apk add supervisor
+
+#REPPLACE NGINX DEFAULT WITH YOUR CODE
+
+RUN rm -f /etc/nginx/http.d/default.conf
+
+ADD ./docker/nginx/http.d/default.conf /etc/nginx/http.d/default.conf
+
+#COPY YOUR SUPERVISOR CONFIG FILES INSIDE SUPERVISOR FOLDER
+
+COPY ./docker/supervisord.conf /etc/supervisor/supervisord.conf
+
+COPY ./docker/supervisor.conf /etc/supervisor/conf.d/supervisor.conf
+
+#MAKE WORKING DIRECTORY AND LOGS DIRECTORY
+
+RUN mkdir -p /home/www/node/node_modules && chown -R node:node /home/www/node
+
+RUN mkdir -p /var/log/supervisor && chown -R node:node /var/log/supervisor
+
+#INSTALL AND RUN NPM 
+
+WORKDIR /home/www/node
+
 COPY package*.json ./
 
-# Install production dependencies
 RUN npm install
+
+RUN npm ci --only=production
 COPY --chown=node:node prisma ./prisma/
 RUN npx prisma generate
 
-ARG PORT
-ENV PORT=${PORT}
-RUN PORT=${PORT}
+COPY --chown=node:node . ./
 
-# Copy the built dependencies to a new image
-FROM node:19-alpine
+EXPOSE 8000
 
-# Set the working directory inside the container
-WORKDIR /app
-
-# Copy the production dependencies from the base image
-COPY --from=base /app/node_modules ./node_modules
-
-# Copy the rest of the application code to the container
-COPY . .
-
-# Expose the port on which the Express app will run
-EXPOSE ${PORT}
-
-# Start the Express application
-CMD ["npm", "start"]
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf"]

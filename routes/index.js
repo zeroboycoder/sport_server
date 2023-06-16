@@ -17,6 +17,28 @@ route.get("/agent-profile/:userId", authController.agentProfile);
 // Agent & User
 route.get("/init-agent", agentUserController.initAgent);
 
+route.post(
+  "/init",
+  [
+    body("player_id")
+      .notEmpty()
+      .withMessage("player_id is required")
+      .isInt()
+      .withMessage("player_id must be an integer"),
+    body("player_name")
+      .notEmpty()
+      .withMessage("player_name is required")
+      .trim(),
+    body("unit_amount")
+      .notEmpty()
+      .withMessage("unit_amount is required")
+      .isInt()
+      .withMessage("unit_amount must be an integer"),
+    body("agent_code").notEmpty().withMessage("agent_code is required").trim(),
+  ],
+  authController.initUser
+);
+
 route.get("/get-users", agentUserController.getUsers);
 
 route.put("/update-user-status", agentUserController.updateUserStatus);
@@ -46,5 +68,9 @@ route.post("/deposit", depositController.deposit);
 route.get("/deposits", depositController.fetchDeposits);
 
 route.put("/update-deposit", depositController.updateDeposit);
+
+route.get("/test", async (req, res) => {
+  res.send("Hello User Service");
+});
 
 module.exports = route;

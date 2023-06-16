@@ -6,11 +6,11 @@ services:
       context: .
       dockerfile: Dockerfile
       args: 
-        - PORT=$PORT
+        - PORT=8000
     restart: always
     ports:
-      - 3000:$PORT
+      - 3000:8000
     environment:
-      - DATABASE_URL=mysql://dai_sport_user:AVNS_gc9BfJBa2ZFxuoSDX0f@db-akh-do-user-8664501-0.b.db.ondigitalocean.com:25060/dai_sport_user_db?ssl-mode=REQUIRED
+      - DATABASE_URL=$DATABASE_URL
     # env_file:
     #   - .env

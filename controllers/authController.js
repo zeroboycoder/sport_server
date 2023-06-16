@@ -2,8 +2,10 @@ require("dotenv").config();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const bcrypt = require("bcrypt");
-const { validationResult } = require("express-validator");
 const { generateToken } = require("../utils/jwt");
+const { validationResult, matchedData } = require("express-validator");
+const response = require("../utils/response");
+const integrationService = require("../services/integrationService");
 
 // Agent
 exports.createAgent = async (req, res) => {
@@ -63,10 +65,8 @@ exports.createAgent = async (req, res) => {
     console.log(error);
     return res.send({
       status: "error",
-      data: {
-        error,
-      },
-      message: "Error",
+      message: error.message,
+      data: null,
     });
   } finally {
     async () => await prisma.$disconnect();
@@ -253,82 +253,17 @@ exports.agentProfile = async (req, res) => {
 // For member
 exports.initUser = async (req, res) => {
   try {
-    const { player_id, player_name, unit_amount, agent_code } = req.body;
     // Chck the validation
-    const validationError = validationResult(req);
-    if (!validationError.isEmpty()) {
-      return res.send({
-        status: "error",
-        data: {
-          error: validationError,
-        },
-        message: "Validation Error",
-      });
+    const result = validationResult(req);
+    if (!result.isEmpty()) {
+      response.error(res, result.array(), "Validation Error");
     }
-    // find the user is exit or not
-    const usercode = agent_code + "_" + player_id;
-    const user = await prisma.user.findFirst({
-      where: {
-        user_code: usercode,
-      },
-      include: {
-        member: true,
-        wallet: true,
-      },
-    });
-    // if user found, retrieve user
-    if (user) {
-      const token = generateToken();
-      return res.send({
-        status: "success",
-        data: {
-          token,
-          ...user,
-        },
-        message: "Found member",
-      });
-    }
-    // if user not found, create user
-    const newUser = await prisma.user.create({
-      data: {
-        user_code: usercode,
-        role: {
-          create: {
-            name: "member",
-          },
-        },
-        member: {
-          create: {
-            name: player_name,
-            agent_code,
-          },
-        },
-        wallet: {
-          create: {
-            type: "main",
-            amount: parseInt(unit_amount),
-          },
-        },
-      },
-    });
-    const token = generateToken();
-    return res.send({
-      status: "success",
-      data: {
-        token,
-        ...newUser,
-      },
-      message: "New member created",
-    });
+    const data = matchedData(req);
+    let user = await integrationService.initDaiSport(data);
+    response.success(res, user, "New member created");
   } catch (error) {
     console.log(error);
-    return res.send({
-      status: "error",
-      data: {
-        error,
-      },
-      message: "Error",
-    });
+    response.error(res, error, "Error");
   } finally {
     async () => await prisma.$disconnect();
   }
