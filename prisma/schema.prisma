@@ -14,7 +14,7 @@ model user {
   id                     Int              @id @default(autoincrement())
   phone                  String?
   password               String?          @default("")
-  user_code              String?
+  user_code              String?          @unique
   status                 Boolean          @default(true)
   ban_end_date           DateTime?
   admin                  admin[]

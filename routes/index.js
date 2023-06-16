@@ -1,6 +1,6 @@
 const route = require("express").Router();
 const authController = require("../controllers/authController");
-const agentController = require("../controllers/agentController");
+const agentUserController = require("../controllers/agentUserController");
 const paymentController = require("../controllers/paymentController");
 const depositController = require("../controllers/depositController");
 
@@ -14,12 +14,12 @@ route.delete("/delete-agent/:userId", authController.deleteAgent);
 
 route.get("/agent-profile/:userId", authController.agentProfile);
 
-// Agent
-route.get("/init-agent", agentController.initAgent);
+// Agent & User
+route.get("/init-agent", agentUserController.initAgent);
 
-route.get("/get-users", agentController.getUsers);
+route.get("/get-users", agentUserController.getUsers);
 
-// route.get("/get-user", agentController.getUserByAgentCode);
+route.put("/update-user-status", agentUserController.updateUserStatus);
 
 // Payment
 route.post("/create-payment-provider", paymentController.createPaymentProvider);
