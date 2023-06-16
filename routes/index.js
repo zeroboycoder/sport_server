@@ -24,6 +24,8 @@ route.put("/update-user-status", agentUserController.updateUserStatus);
 // Payment
 route.post("/create-payment-provider", paymentController.createPaymentProvider);
 
+route.get("/payment-providers", paymentController.fetchPaymentProviders);
+
 route.delete(
   "/delete-payment-providers/:provider_id",
   paymentController.deletePaymentProvider

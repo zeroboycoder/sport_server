@@ -16,9 +16,33 @@ exports.createPaymentProvider = async (req, res) => {
     return res.send({
       status: "success",
       data: {
-        ...result,
+        result,
       },
       message: "Payment Provider created",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.send({
+      status: "error",
+      data: {
+        error,
+      },
+      message: "Error",
+    });
+  } finally {
+    async () => await prisma.$disconnect();
+  }
+};
+
+exports.fetchPaymentProviders = async (req, res) => {
+  try {
+    const result = await prisma.paymentProvider.findMany({});
+    return res.send({
+      status: "success",
+      data: {
+        result,
+      },
+      message: "Successful",
     });
   } catch (error) {
     console.log(error);
@@ -79,7 +103,7 @@ exports.createPaymentAccount = async (req, res) => {
     return res.send({
       status: "success",
       data: {
-        ...result,
+        result,
       },
       message: "Payment Account created",
     });
@@ -107,7 +131,7 @@ exports.fetchPaymentAccounts = async (req, res) => {
     return res.send({
       status: "success",
       data: {
-        ...result,
+        result,
       },
       message: "Successful",
     });
