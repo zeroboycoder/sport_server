@@ -23,7 +23,7 @@ model user {
   wallet                 wallet[]
   createdAt              DateTime         @default(now())
   updatedAt              DateTime         @updatedAt
-  role                   role?            @relation(fields: [roleId], references: [id])
+  role                   role?            @relation(fields: [roleId], references: [id], name: "roleRelation")
   roleId                 Int?
   deposit                deposit[]
   transferRecordSender   transferRecord[] @relation("TransferRecordSender")
@@ -68,7 +68,7 @@ model wallet {
 model role {
   id   Int    @id @default(autoincrement())
   name String @db.VarChar(255)
-  user user[]
+  user user[] @relation(name: "roleRelation")
 }
 
 model paymentProvider {
