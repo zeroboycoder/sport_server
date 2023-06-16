@@ -13,7 +13,7 @@ async function main() {
     "Phillip",
     "Loppi",
     "Scarlet",
-    "Jenefer",
+    "Jennifer",
     "Tom",
     "Jerry",
   ];
@@ -39,7 +39,7 @@ async function main() {
       wallet: {
         create: {
           type: "main",
-          amount: 0,
+          amount: 120000,
         },
       },
     },
