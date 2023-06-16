@@ -4,7 +4,9 @@ const express = require("express"),
   swaggerUi = require("swagger-ui-express"),
   app = express(),
   PORT = process.env.PORT || 8000,
-  routes = require("./routes");
+  routes = require("./routes"),
+  authRoute = require("./routes/auth"),
+  { authenticateToken } = require("./utils/middleware");
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -28,7 +30,8 @@ const options = {
 
 const spacs = swaggerJsdocs(options);
 
-app.use("/api/users", routes);
+app.use("/api/users", authRoute);
+app.use("/api/users", authenticateToken, routes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(spacs));
 
 app.listen(PORT, () => console.log(`Server is running at ${PORT}`));

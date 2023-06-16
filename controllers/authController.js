@@ -2,8 +2,8 @@ require("dotenv").config();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
+const { generateToken } = require("../utils/jwt");
 
 // Agent
 exports.createAgent = async (req, res) => {
@@ -51,7 +51,7 @@ exports.createAgent = async (req, res) => {
         },
       },
     });
-    const token = jwt.sign({ userId: newUser.id }, process.env.TOKEN);
+    const token = generateToken();
     return res.send({
       status: "success",
       data: {
@@ -109,7 +109,7 @@ exports.signinAgent = async (req, res) => {
           message: "Wrong password",
         });
       }
-      const token = jwt.sign({ userId: user.id }, process.env.TOKEN);
+      const token = generateToken();
       return res.send({
         status: "success",
         data: {
@@ -153,12 +153,9 @@ exports.updateAgent = async (req, res) => {
         agent: true,
       },
     });
-    const token = jwt.sign({ userId: user.id }, process.env.TOKEN);
     return res.send({
       status: "success",
-      data: {
-        token,
-      },
+      data: {},
       message: "Agent updated.",
     });
   } catch (error) {
@@ -281,7 +278,7 @@ exports.initUser = async (req, res) => {
     });
     // if user found, retrieve user
     if (user) {
-      const token = jwt.sign({ userId: user.id }, process.env.TOKEN);
+      const token = generateToken();
       return res.send({
         status: "success",
         data: {
@@ -314,7 +311,7 @@ exports.initUser = async (req, res) => {
         },
       },
     });
-    const token = jwt.sign({ userId: newUser.id }, process.env.TOKEN);
+    const token = generateToken();
     return res.send({
       status: "success",
       data: {
