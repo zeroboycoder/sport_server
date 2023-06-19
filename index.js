@@ -2,14 +2,12 @@ const express = require("express"),
   bodyParser = require("body-parser"),
   swaggerJsdocs = require("swagger-jsdoc"),
   swaggerUi = require("swagger-ui-express"),
+  cors = require("cors"),
   app = express(),
   PORT = process.env.PORT || 8000,
   routes = require("./routes"),
   authRoute = require("./routes/auth"),
   { authenticateToken } = require("./utils/middleware");
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
 
 // Swagger UI
 const options = {
@@ -27,8 +25,11 @@ const options = {
   },
   apis: ["./routes/swagger.js"],
 };
-
 const spacs = swaggerJsdocs(options);
+
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use("/api/users", authRoute);
 app.use("/api/users", authenticateToken, routes);
