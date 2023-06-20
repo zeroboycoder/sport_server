@@ -1,4 +1,5 @@
 const route = require("express").Router();
+const { body } = require("express-validator");
 const authController = require("../controllers/authController");
 const agentUserController = require("../controllers/agentUserController");
 const paymentController = require("../controllers/paymentController");
