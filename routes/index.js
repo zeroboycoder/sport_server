@@ -5,9 +5,6 @@ const agentUserController = require("../controllers/agentUserController");
 const paymentController = require("../controllers/paymentController");
 const depositController = require("../controllers/depositController");
 
-// Test api
-route.get("/", (req, res) => res.send("Hello World"));
-
 // Authentication
 route.put("/update-agent/:userId", authController.updateAgent);
 

@@ -2,6 +2,10 @@ const route = require("express").Router();
 const { body } = require("express-validator");
 const authController = require("../controllers/authController");
 
+// Test api
+route.get("/", (req, res) => res.send("Hello World"));
+
+// auth
 route.post(
   "/create-agent",
   [
