@@ -5,6 +5,11 @@ const authController = require("../controllers/authController");
 // Test api
 route.get("/", (req, res) => res.send("Hello World"));
 
+route.post("/post-test", (req, res) => {
+  const { email, name } = req.body;
+  return res.send({ email, name });
+});
+
 // auth
 route.post(
   "/create-agent",
